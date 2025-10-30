@@ -1,23 +1,75 @@
 {
-  "scc_dfs_visits" : 84,
-  "components" : [ [ 0, 2, 1 ], [ 3, 5, 4 ], [ 9, 11, 10 ], [ 15, 17, 16 ], [ 21, 23, 22 ], [ 27, 29, 28 ], [ 33, 35, 34 ], [ 39, 41, 40 ], [ 6, 8, 7 ], [ 12, 14, 13 ], [ 18, 20, 19 ], [ 24, 26, 25 ], [ 30, 32, 31 ], [ 36, 38, 37 ] ],
   "directed" : true,
+  "components" : [ {
+    "nodes" : [ 0, 2, 1 ],
+    "size" : 3,
+    "id" : 0
+  }, {
+    "nodes" : [ 3, 5, 4 ],
+    "size" : 3,
+    "id" : 1
+  }, {
+    "nodes" : [ 9, 11, 10 ],
+    "size" : 3,
+    "id" : 2
+  }, {
+    "nodes" : [ 15, 17, 16 ],
+    "size" : 3,
+    "id" : 3
+  }, {
+    "nodes" : [ 21, 23, 22 ],
+    "size" : 3,
+    "id" : 4
+  }, {
+    "nodes" : [ 27, 29, 28 ],
+    "size" : 3,
+    "id" : 5
+  }, {
+    "nodes" : [ 33, 35, 34 ],
+    "size" : 3,
+    "id" : 6
+  }, {
+    "nodes" : [ 39, 41, 40 ],
+    "size" : 3,
+    "id" : 7
+  }, {
+    "nodes" : [ 6, 8, 7 ],
+    "size" : 3,
+    "id" : 8
+  }, {
+    "nodes" : [ 12, 14, 13 ],
+    "size" : 3,
+    "id" : 9
+  }, {
+    "nodes" : [ 18, 20, 19 ],
+    "size" : 3,
+    "id" : 10
+  }, {
+    "nodes" : [ 24, 26, 25 ],
+    "size" : 3,
+    "id" : 11
+  }, {
+    "nodes" : [ 30, 32, 31 ],
+    "size" : 3,
+    "id" : 12
+  }, {
+    "nodes" : [ 36, 38, 37 ],
+    "size" : 3,
+    "id" : 13
+  } ],
   "source_component" : 0,
+  "longest_paths_time_ms" : 0.0068,
   "longest_distances" : [ 0, 2, 3, 5, 6, 8, 9, 11, 3, 7, 10, 15, 18, 22 ],
-  "longest_paths_time_ms" : 0.0066,
-  "relax_operations" : 39,
-  "scc_edge_traversals" : 110,
-  "shortest_paths_time_ms" : 0.0113,
-  "total_time_ms" : 0.1818,
+  "shortest_paths_time_ms" : 0.0096,
+  "total_time_ms" : 0.128,
   "topo_time_ms" : 0.0184,
-  "topo_queue_pushes" : 14,
   "edge_count" : 55,
-  "topo_queue_pops" : 14,
   "original_source" : 0,
+  "taskOrder" : [ 0, 2, 1, 3, 5, 4, 6, 8, 7, 9, 11, 10, 12, 14, 13, 15, 17, 16, 18, 20, 19, 21, 23, 22, 24, 26, 25, 27, 29, 28, 30, 32, 31, 33, 35, 34, 36, 38, 37, 39, 41, 40 ],
   "filename" : "large_complex_scc.json",
-  "scc_time_ms" : 0.1455,
+  "scc_time_ms" : 0.0932,
   "shortest_distances" : [ 0, 2, 3, 5, 6, 8, 9, 11, 3, 7, 10, 15, 18, 22 ],
-  "topological_order" : [ 0, 1, 8, 2, 9, 3, 10, 4, 11, 5, 12, 6, 13, 7 ],
+  "componentOrder" : [ 0, 1, 8, 2, 9, 3, 10, 4, 11, 5, 12, 6, 13, 7 ],
   "node_count" : 42,
   "is_dag" : true,
   "metrics" : {
@@ -28,7 +80,6 @@
     "queue_pops" : 14,
     "scc_count" : 14
   },
-  "scc_count" : 14,
   "critical_path" : {
     "length" : 22,
     "path" : [ 0, 8, 9, 10, 11, 12, 13 ]

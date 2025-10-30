@@ -1,23 +1,99 @@
 {
-  "scc_dfs_visits" : 70,
-  "components" : [ [ 0 ], [ 1 ], [ 2 ], [ 3 ], [ 4 ], [ 5 ], [ 6 ], [ 7 ], [ 8 ], [ 9 ], [ 10, 25, 15, 14, 13, 12, 11, 24, 23, 22, 21, 20, 19, 18, 17, 16 ], [ 26 ], [ 27 ], [ 28 ], [ 29 ], [ 30 ], [ 31 ], [ 32 ], [ 33 ], [ 34 ] ],
   "directed" : true,
+  "components" : [ {
+    "nodes" : [ 0 ],
+    "size" : 1,
+    "id" : 0
+  }, {
+    "nodes" : [ 1 ],
+    "size" : 1,
+    "id" : 1
+  }, {
+    "nodes" : [ 2 ],
+    "size" : 1,
+    "id" : 2
+  }, {
+    "nodes" : [ 3 ],
+    "size" : 1,
+    "id" : 3
+  }, {
+    "nodes" : [ 4 ],
+    "size" : 1,
+    "id" : 4
+  }, {
+    "nodes" : [ 5 ],
+    "size" : 1,
+    "id" : 5
+  }, {
+    "nodes" : [ 6 ],
+    "size" : 1,
+    "id" : 6
+  }, {
+    "nodes" : [ 7 ],
+    "size" : 1,
+    "id" : 7
+  }, {
+    "nodes" : [ 8 ],
+    "size" : 1,
+    "id" : 8
+  }, {
+    "nodes" : [ 9 ],
+    "size" : 1,
+    "id" : 9
+  }, {
+    "nodes" : [ 10, 25, 15, 14, 13, 12, 11, 24, 23, 22, 21, 20, 19, 18, 17, 16 ],
+    "size" : 16,
+    "id" : 10
+  }, {
+    "nodes" : [ 26 ],
+    "size" : 1,
+    "id" : 11
+  }, {
+    "nodes" : [ 27 ],
+    "size" : 1,
+    "id" : 12
+  }, {
+    "nodes" : [ 28 ],
+    "size" : 1,
+    "id" : 13
+  }, {
+    "nodes" : [ 29 ],
+    "size" : 1,
+    "id" : 14
+  }, {
+    "nodes" : [ 30 ],
+    "size" : 1,
+    "id" : 15
+  }, {
+    "nodes" : [ 31 ],
+    "size" : 1,
+    "id" : 16
+  }, {
+    "nodes" : [ 32 ],
+    "size" : 1,
+    "id" : 17
+  }, {
+    "nodes" : [ 33 ],
+    "size" : 1,
+    "id" : 18
+  }, {
+    "nodes" : [ 34 ],
+    "size" : 1,
+    "id" : 19
+  } ],
   "source_component" : 0,
+  "longest_paths_time_ms" : 0.0066,
   "longest_distances" : [ 0, 2, 5, 6, 10, 12, 15, 16, 21, 23, 26, 29, 30, 34, 36, 39, 40, 45, 47, 50 ],
-  "longest_paths_time_ms" : 0.0081,
-  "relax_operations" : 60,
-  "scc_edge_traversals" : 74,
-  "shortest_paths_time_ms" : 0.0116,
-  "total_time_ms" : 0.14659999999999998,
-  "topo_time_ms" : 0.0239,
-  "topo_queue_pushes" : 20,
+  "shortest_paths_time_ms" : 0.0108,
+  "total_time_ms" : 0.1369,
+  "topo_time_ms" : 0.0232,
   "edge_count" : 37,
-  "topo_queue_pops" : 20,
   "original_source" : 0,
+  "taskOrder" : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 15, 14, 13, 12, 11, 24, 23, 22, 21, 20, 19, 18, 17, 16, 26, 27, 28, 29, 30, 31, 32, 33, 34 ],
   "filename" : "large_sparse.json",
-  "scc_time_ms" : 0.103,
+  "scc_time_ms" : 0.0963,
   "shortest_distances" : [ 0, 2, 5, 6, 10, 12, 15, 16, 21, 23, 14, 17, 18, 22, 24, 27, 28, 33, 35, 38 ],
-  "topological_order" : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ],
+  "componentOrder" : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ],
   "node_count" : 35,
   "is_dag" : true,
   "metrics" : {
@@ -28,7 +104,6 @@
     "queue_pops" : 20,
     "scc_count" : 20
   },
-  "scc_count" : 20,
   "critical_path" : {
     "length" : 50,
     "path" : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]

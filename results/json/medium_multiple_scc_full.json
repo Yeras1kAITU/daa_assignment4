@@ -1,23 +1,43 @@
 {
-  "scc_dfs_visits" : 30,
-  "components" : [ [ 11, 14, 13, 12 ], [ 0, 2, 1 ], [ 3, 5, 4 ], [ 6, 8, 7 ], [ 9 ], [ 10 ] ],
   "directed" : true,
+  "components" : [ {
+    "nodes" : [ 11, 14, 13, 12 ],
+    "size" : 4,
+    "id" : 0
+  }, {
+    "nodes" : [ 0, 2, 1 ],
+    "size" : 3,
+    "id" : 1
+  }, {
+    "nodes" : [ 3, 5, 4 ],
+    "size" : 3,
+    "id" : 2
+  }, {
+    "nodes" : [ 6, 8, 7 ],
+    "size" : 3,
+    "id" : 3
+  }, {
+    "nodes" : [ 9 ],
+    "size" : 1,
+    "id" : 4
+  }, {
+    "nodes" : [ 10 ],
+    "size" : 1,
+    "id" : 5
+  } ],
   "source_component" : 1,
-  "longest_distances" : [ -2147483648, 0, 6, 9, 11, 12 ],
-  "longest_paths_time_ms" : 0.0025,
-  "relax_operations" : 12,
-  "scc_edge_traversals" : 34,
-  "shortest_paths_time_ms" : 0.0062,
-  "total_time_ms" : 0.1042,
-  "topo_time_ms" : 0.0156,
-  "topo_queue_pushes" : 6,
+  "longest_paths_time_ms" : 0.0023,
+  "longest_distances" : [ "UNREACHABLE", 0, 6, 9, 11, 12 ],
+  "shortest_paths_time_ms" : 0.0068,
+  "total_time_ms" : 0.1224,
+  "topo_time_ms" : 0.0159,
   "edge_count" : 17,
-  "topo_queue_pops" : 6,
   "original_source" : 0,
+  "taskOrder" : [ 11, 14, 13, 12, 0, 2, 1, 3, 5, 4, 6, 8, 7, 9, 10 ],
   "filename" : "medium_multiple_scc.json",
-  "scc_time_ms" : 0.0799,
-  "shortest_distances" : [ 2147483647, 0, 6, 9, 11, 12 ],
-  "topological_order" : [ 0, 1, 2, 3, 4, 5 ],
+  "scc_time_ms" : 0.0974,
+  "shortest_distances" : [ "UNREACHABLE", 0, 6, 9, 11, 12 ],
+  "componentOrder" : [ 0, 1, 2, 3, 4, 5 ],
   "node_count" : 15,
   "is_dag" : true,
   "metrics" : {
@@ -28,7 +48,6 @@
     "queue_pops" : 6,
     "scc_count" : 6
   },
-  "scc_count" : 6,
   "critical_path" : {
     "length" : 12,
     "path" : [ 1, 2, 3, 4, 5 ]

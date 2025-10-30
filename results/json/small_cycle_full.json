@@ -1,23 +1,31 @@
 {
-  "scc_dfs_visits" : 14,
-  "components" : [ [ 0, 6, 5 ], [ 1 ], [ 2, 4, 3 ] ],
   "directed" : true,
+  "components" : [ {
+    "nodes" : [ 0, 6, 5 ],
+    "size" : 3,
+    "id" : 0
+  }, {
+    "nodes" : [ 1 ],
+    "size" : 1,
+    "id" : 1
+  }, {
+    "nodes" : [ 2, 4, 3 ],
+    "size" : 3,
+    "id" : 2
+  } ],
   "source_component" : 0,
+  "longest_paths_time_ms" : 0.0018,
   "longest_distances" : [ 0, 3, 5 ],
-  "longest_paths_time_ms" : 0.0027,
-  "relax_operations" : 6,
-  "scc_edge_traversals" : 16,
-  "shortest_paths_time_ms" : 0.0069,
-  "total_time_ms" : 0.0809,
-  "topo_time_ms" : 0.0158,
-  "topo_queue_pushes" : 3,
+  "shortest_paths_time_ms" : 0.0068,
+  "total_time_ms" : 0.0926,
+  "topo_time_ms" : 0.0141,
   "edge_count" : 8,
-  "topo_queue_pops" : 3,
   "original_source" : 0,
+  "taskOrder" : [ 0, 6, 5, 1, 2, 4, 3 ],
   "filename" : "small_cycle.json",
-  "scc_time_ms" : 0.0555,
+  "scc_time_ms" : 0.0699,
   "shortest_distances" : [ 0, 3, 5 ],
-  "topological_order" : [ 0, 1, 2 ],
+  "componentOrder" : [ 0, 1, 2 ],
   "node_count" : 7,
   "is_dag" : true,
   "metrics" : {
@@ -28,7 +36,6 @@
     "queue_pops" : 3,
     "scc_count" : 3
   },
-  "scc_count" : 3,
   "critical_path" : {
     "length" : 5,
     "path" : [ 0, 1, 2 ]

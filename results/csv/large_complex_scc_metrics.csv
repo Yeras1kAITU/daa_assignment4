@@ -1,5 +1,5 @@
 algorithm,time_ms,operations,components,source,has_cycles,critical_path_length
-SCC,0,146,194,14,0,false,22
+SCC,0,093,194,14,0,false,22
 TopologicalSort,0,018,28,14,0,false,22
-PathFinding,0,018,39,14,0,false,22
-TOTAL,0,182,261,14,0,false,22
+PathFinding,0,016,39,14,0,false,22
+TOTAL,0,128,261,14,0,false,22

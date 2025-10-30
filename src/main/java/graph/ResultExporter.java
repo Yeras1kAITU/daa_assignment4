@@ -40,7 +40,7 @@ public class ResultExporter {
         try {
             Map<String, Object> sccData = new HashMap<>();
             sccData.put("filename", filename);
-            sccData.put("components", components);
+            sccData.put("components", createComponentObjects(components));
             sccData.put("component_count", components.size());
             sccData.put("node_count", graphData.n);
             sccData.put("edge_count", graphData.edges.size());
@@ -56,10 +56,40 @@ public class ResultExporter {
     }
 
     private void exportGraphJson(Map<String, Object> results, String baseName) throws IOException {
-        Map<String, Object> exportData = new HashMap<>(results);
+        Map<String, Object> exportData = new HashMap<>();
+
+        exportData.put("filename", results.get("filename"));
+        exportData.put("node_count", results.get("node_count"));
+        exportData.put("edge_count", results.get("edge_count"));
+        exportData.put("directed", results.get("directed"));
+        exportData.put("original_source", results.get("original_source"));
+        exportData.put("source_component", results.get("source_component"));
+        exportData.put("is_dag", results.get("is_dag"));
+
+        List<List<Integer>> components = (List<List<Integer>>) results.get("components");
+        exportData.put("components", createComponentObjects(components));
+
+        if (results.containsKey("topological_order")) {
+            List<Integer> topoOrder = (List<Integer>) results.get("topological_order");
+            exportData.put("componentOrder", topoOrder);
+            exportData.put("taskOrder", createTaskOrder(components, topoOrder));
+        }
+
+        exportData.put("scc_time_ms", results.get("scc_time_ms"));
+        exportData.put("topo_time_ms", results.get("topo_time_ms"));
+        exportData.put("shortest_paths_time_ms", results.get("shortest_paths_time_ms"));
+        exportData.put("longest_paths_time_ms", results.get("longest_paths_time_ms"));
+        exportData.put("total_time_ms", results.get("total_time_ms"));
+
+        exportData.put("shortest_distances", createDistanceDisplay((int[]) results.get("shortest_distances")));
+        exportData.put("longest_distances", createDistanceDisplay((int[]) results.get("longest_distances")));
+
+        if (results.containsKey("critical_path")) {
+            exportData.put("critical_path", results.get("critical_path"));
+        }
 
         Map<String, Object> metricsData = new HashMap<>();
-        metricsData.put("scc_count", results.get("scc_count"));
+        metricsData.put("scc_count", components.size());
         metricsData.put("dfs_visits", results.get("scc_dfs_visits"));
         metricsData.put("edge_traversals", results.get("scc_edge_traversals"));
         metricsData.put("queue_pushes", results.get("topo_queue_pushes"));
@@ -70,6 +100,38 @@ public class ResultExporter {
 
         String jsonFile = baseDir + "/json/" + baseName + "_full.json";
         jsonMapper.writeValue(new File(jsonFile), exportData);
+    }
+
+    private List<Map<String, Object>> createComponentObjects(List<List<Integer>> components) {
+        List<Map<String, Object>> componentObjects = new ArrayList<>();
+        for (int i = 0; i < components.size(); i++) {
+            Map<String, Object> component = new HashMap<>();
+            component.put("id", i);
+            component.put("size", components.get(i).size());
+            component.put("nodes", components.get(i));
+            componentObjects.add(component);
+        }
+        return componentObjects;
+    }
+
+    private List<Integer> createTaskOrder(List<List<Integer>> components, List<Integer> componentOrder) {
+        List<Integer> taskOrder = new ArrayList<>();
+        for (int compId : componentOrder) {
+            taskOrder.addAll(components.get(compId));
+        }
+        return taskOrder;
+    }
+
+    private List<Object> createDistanceDisplay(int[] distances) {
+        List<Object> display = new ArrayList<>();
+        for (int distance : distances) {
+            if (distance == Integer.MAX_VALUE || distance == Integer.MIN_VALUE) {
+                display.add("UNREACHABLE");
+            } else {
+                display.add(distance);
+            }
+        }
+        return display;
     }
 
     private void exportGraphCsv(Map<String, Object> results, int condensationSize, String baseName) throws IOException {
