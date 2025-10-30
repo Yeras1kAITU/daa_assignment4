@@ -58,7 +58,7 @@ public class GraphUtils {
         }
     }
 
-    // Calculates graph density\
+    // Calculates graph density
     public static double calculateDensity(Graph graph) {
         int n = graph.getNodeCount();
         if (n <= 1) return 0.0;

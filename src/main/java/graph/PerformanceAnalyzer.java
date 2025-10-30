@@ -48,9 +48,9 @@ public class PerformanceAnalyzer {
 
     // Generates performance report comparing all analyzed graphs
     public void generateReport() {
-        System.out.println("\n" + "📊".repeat(50));
+        System.out.println("\n" + "=".repeat(30));
         System.out.println("PERFORMANCE ANALYSIS REPORT");
-        System.out.println("📊".repeat(50));
+        System.out.println("=".repeat(30));
 
         for (PerformanceResult result : results) {
             System.out.println("\nGraph: " + result.graphName);
@@ -61,24 +61,6 @@ public class PerformanceAnalyzer {
                 System.out.println("  Path: " + result.pathTime + "ms");
             }
             System.out.println("  Total: " + result.getTotalTime() + "ms");
-        }
-
-        printOptimizationSuggestions();
-    }
-
-    private void printOptimizationSuggestions() {
-        System.out.println("\n💡 OPTIMIZATION SUGGESTIONS:");
-
-        for (PerformanceResult result : results) {
-            if (result.sccTime > 100) {
-                System.out.println("  • " + result.graphName + ": SCC computation is slow - consider iterative DFS");
-            }
-            if (result.topoTime > 50) {
-                System.out.println("  • " + result.graphName + ": Topological sort may benefit from array-based queue");
-            }
-            if (result.sccComponents == result.nodeCount) {
-                System.out.println("  • " + result.graphName + ": Graph is a DAG - SCC step could be optimized");
-            }
         }
     }
 

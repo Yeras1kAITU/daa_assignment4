@@ -5,12 +5,9 @@ import graph.topo.TopologicalSort;
 import graph.dagsp.DAGShortestPath;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
-/**
- * Main application orchestrator for smart city scheduling using graph algorithms.
- * SCC detection, topological sorting, and path finding for task scheduling.
- */
 public class SmartCityScheduler {
     private final Metrics metrics;
     private final ObjectMapper objectMapper;
@@ -34,7 +31,6 @@ public class SmartCityScheduler {
 
             printGraphSummary(graphData, graph);
 
-            // Algorithm pipeline
             processSCCs(graph);
 
         } catch (Exception e) {
@@ -92,7 +88,7 @@ public class SmartCityScheduler {
         printShortestPathResults(shortestDist, sourceComponent, components);
         printMetrics("Shortest Paths");
 
-        // Longest paths (critical path)
+        // Longest paths
         metrics.reset();
         DAGShortestPath.CriticalPath criticalPath = sp.findCriticalPath(sourceComponent, topoOrder);
         printCriticalPathResults(criticalPath, components);
@@ -189,7 +185,7 @@ public class SmartCityScheduler {
         System.out.println("   • Relax Operations: " + metrics.getRelaxOperations());
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         SmartCityScheduler scheduler = new SmartCityScheduler();
 
         // Process all datasets
@@ -210,5 +206,20 @@ public class SmartCityScheduler {
         System.out.println("\n" + "-".repeat(7));
         System.out.println("All datasets processed successfully!");
         System.out.println("-".repeat(7));
+
+        System.out.println("\n" + "*".repeat(30));
+        System.out.println("PERFORMANCE BENCHMARK");
+        System.out.println("*".repeat(30));
+
+        PerformanceAnalyzer perfAnalyzer = new PerformanceAnalyzer();
+        for (String dataset : datasets) {
+            try {
+                Graph graph = GraphUtils.loadGraphFromFile("data/" + dataset);
+                perfAnalyzer.analyzeGraph(graph, dataset);
+            } catch (Exception e) {
+                System.out.println("Failed to analyze: " + dataset);
+            }
+        }
+        perfAnalyzer.generateReport();
     }
 }
