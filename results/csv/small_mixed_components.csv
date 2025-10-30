@@ -1,0 +1,6 @@
+component_id,size,node_list,is_cycle
+0,1,"[0]",false
+1,1,"[2]",false
+2,1,"[1]",false
+3,3,"[7, 6, 8]",true
+4,3,"[3, 5, 4]",true

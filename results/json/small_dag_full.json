@@ -1,0 +1,36 @@
+{
+  "scc_dfs_visits" : 16,
+  "components" : [ [ 0 ], [ 2 ], [ 1 ], [ 3 ], [ 4 ], [ 5 ], [ 6 ], [ 7 ] ],
+  "directed" : true,
+  "source_component" : 0,
+  "longest_distances" : [ 0, 1, 2, 6, 8, 9, 12, 14 ],
+  "longest_paths_time_ms" : 0.0066,
+  "relax_operations" : 24,
+  "scc_edge_traversals" : 16,
+  "shortest_paths_time_ms" : 0.0466,
+  "total_time_ms" : 0.8805000000000001,
+  "topo_time_ms" : 0.1796,
+  "topo_queue_pushes" : 8,
+  "edge_count" : 8,
+  "topo_queue_pops" : 8,
+  "original_source" : 0,
+  "filename" : "small_dag.json",
+  "scc_time_ms" : 0.6477,
+  "shortest_distances" : [ 0, 1, 2, 4, 6, 7, 10, 12 ],
+  "topological_order" : [ 0, 2, 1, 3, 4, 5, 6, 7 ],
+  "node_count" : 8,
+  "is_dag" : true,
+  "metrics" : {
+    "edge_traversals" : 16,
+    "dfs_visits" : 16,
+    "relax_operations" : 24,
+    "queue_pushes" : 8,
+    "queue_pops" : 8,
+    "scc_count" : 8
+  },
+  "scc_count" : 8,
+  "critical_path" : {
+    "length" : 14,
+    "path" : [ 0, 2, 3, 4, 5, 6, 7 ]
+  }
+}

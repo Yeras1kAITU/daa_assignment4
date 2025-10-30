@@ -128,8 +128,6 @@ public class StronglyConnectedComponents {
     }
 
     public Graph getWeightedCondensationGraph() {
-        // For now, returns the same as getCondensationGraph()
-        // In advanced implementation will aggregate weights from original nodes
         return condensationGraph;
     }
 }

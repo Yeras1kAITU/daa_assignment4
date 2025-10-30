@@ -5,94 +5,157 @@ import graph.topo.TopologicalSort;
 import graph.dagsp.DAGShortestPath;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class SmartCityScheduler {
-    private final Metrics metrics;
     private final ObjectMapper objectMapper;
+    private final ResultExporter resultExporter;
+    private final List<Map<String, Object>> allResults;
 
     public SmartCityScheduler() {
-        this.metrics = new Metrics();
         this.objectMapper = new ObjectMapper();
+        this.resultExporter = new ResultExporter();
+        this.allResults = new ArrayList<>();
     }
 
-    // Processes a graph file through the complete algorithm pipeline
     public void processGraph(String filename) {
         try {
             System.out.println("\n" + "=".repeat(60));
             System.out.println("PROCESSING: " + filename);
             System.out.println("=".repeat(60));
 
-            // Load and validate graph
             GraphData graphData = loadGraphData("data/" + filename);
             Graph graph = GraphUtils.createGraphFromData(graphData);
             GraphUtils.validateGraph(graph);
 
             printGraphSummary(graphData, graph);
 
-            processSCCs(graph);
+            Map<String, Object> result = processSCCs(graph, graphData.source, filename, graphData);
+            if (result != null) {
+                allResults.add(result);
+            }
 
         } catch (Exception e) {
-            System.err.println("!!!Error processing " + filename + ": " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error processing " + filename + ": " + e.getMessage());
         }
     }
 
-    private void processSCCs(Graph graph) {
+    private Map<String, Object> processSCCs(Graph graph, int originalSource, String filename, GraphData graphData) {
         System.out.println("\n1. STRONGLY CONNECTED COMPONENTS ANALYSIS");
         System.out.println("-".repeat(50));
 
-        metrics.reset();
+        Metrics metrics = new Metrics();
         StronglyConnectedComponents scc = new StronglyConnectedComponents(graph, metrics);
         List<List<Integer>> components = scc.findSCCs();
 
-        printSCCResults(components);
-        printMetrics("SCC Detection");
+        Map<String, Object> result = new HashMap<>();
+        result.put("filename", filename);
+        result.put("original_source", originalSource);
+        result.put("components", components);
+        result.put("node_count", graphData.n);
+        result.put("edge_count", graphData.edges.size());
+        result.put("directed", graphData.directed);
+        result.put("scc_count", components.size());
 
-        // Build condensation graph and continue pipeline
+        printSCCResults(components);
+        printMetrics("SCC Detection", metrics);
+
+        result.put("scc_time_ms", metrics.getElapsedTimeMillis());
+        result.put("scc_dfs_visits", metrics.getDfsVisits());
+        result.put("scc_edge_traversals", metrics.getEdgeTraversals());
+
         Graph condensation = scc.getCondensationGraph();
-        processTopologicalSort(condensation, components, scc.getComponentIds());
+        return processTopologicalSort(condensation, components, scc.getComponentIds(), originalSource, filename, result, graphData);
     }
 
-    private void processTopologicalSort(Graph condensation, List<List<Integer>> components, int[] componentIds) {
+    private Map<String, Object> processTopologicalSort(Graph condensation, List<List<Integer>> components,
+                                                       int[] componentIds, int originalSource, String filename,
+                                                       Map<String, Object> result, GraphData graphData) {
         System.out.println("\n2. TOPOLOGICAL SORT & TASK SCHEDULING");
         System.out.println("-".repeat(50));
 
-        metrics.reset();
+        Metrics metrics = new Metrics();
         TopologicalSort topo = new TopologicalSort(condensation, metrics);
         List<Integer> topoOrder = topo.topologicalOrder();
 
+        result.put("topological_order", topoOrder);
+        result.put("is_dag", !topoOrder.isEmpty());
+        result.put("topo_time_ms", metrics.getElapsedTimeMillis());
+        result.put("topo_queue_pushes", metrics.getQueuePushes());
+        result.put("topo_queue_pops", metrics.getQueuePops());
+
         if (topoOrder.isEmpty()) {
-            System.out.println("!!!Graph contains cycles - cannot compute topological order");
-            return;
+            System.out.println("Graph contains cycles - cannot compute topological order");
+            resultExporter.exportSCCResults(filename, components, graphData);
+            return result;
         }
 
         printTopologicalResults(topoOrder, components);
-        printMetrics("Topological Sort");
+        printMetrics("Topological Sort", metrics);
 
-        // Continue with path finding on the DAG
-        processPathFinding(condensation, topoOrder, components);
+        return processPathFinding(condensation, topoOrder, components, componentIds, originalSource, filename, result);
     }
 
-    private void processPathFinding(Graph condensation, List<Integer> topoOrder, List<List<Integer>> components) {
+    private Map<String, Object> processPathFinding(Graph condensation, List<Integer> topoOrder,
+                                                   List<List<Integer>> components, int[] componentIds,
+                                                   int originalSource, String filename, Map<String, Object> result) {
         System.out.println("\n3. PATH FINDING & CRITICAL PATH ANALYSIS");
         System.out.println("-".repeat(50));
 
-        // Shortest paths
-        metrics.reset();
-        DAGShortestPath sp = new DAGShortestPath(condensation, metrics);
-        int sourceComponent = 0; // Use first component as source
+        int sourceComponent = mapSourceToCondensation(originalSource, componentIds, components);
+        System.out.println("Using source node " + originalSource + " -> Component " + sourceComponent);
 
-        int[] shortestDist = sp.shortestPaths(sourceComponent, topoOrder);
+        result.put("source_component", sourceComponent);
+
+        Metrics shortestMetrics = new Metrics();
+        DAGShortestPath shortestSp = new DAGShortestPath(condensation, shortestMetrics);
+        int[] shortestDist = shortestSp.shortestPaths(sourceComponent, topoOrder);
+        result.put("shortest_distances", shortestDist);
+        result.put("shortest_paths_time_ms", shortestMetrics.getElapsedTimeMillis());
+
         printShortestPathResults(shortestDist, sourceComponent, components);
-        printMetrics("Shortest Paths");
+        printMetrics("Shortest Paths", shortestMetrics);
 
-        // Longest paths
-        metrics.reset();
-        DAGShortestPath.CriticalPath criticalPath = sp.findCriticalPath(sourceComponent, topoOrder);
+        Metrics longestMetrics = new Metrics();
+        DAGShortestPath longestSp = new DAGShortestPath(condensation, longestMetrics);
+        int[] longestDist = longestSp.longestPaths(sourceComponent, topoOrder);
+        DAGShortestPath.CriticalPath criticalPath = longestSp.findCriticalPath(sourceComponent, topoOrder);
+        result.put("longest_distances", longestDist);
+        result.put("critical_path", criticalPath);
+        result.put("longest_paths_time_ms", longestMetrics.getElapsedTimeMillis());
+
         printCriticalPathResults(criticalPath, components);
-        printMetrics("Longest Paths");
+        printMetrics("Longest Paths", longestMetrics);
+
+        double sccTime = (Double) result.get("scc_time_ms");
+        double topoTime = (Double) result.get("topo_time_ms");
+        double shortestTime = (Double) result.get("shortest_paths_time_ms");
+        double longestTime = (Double) result.get("longest_paths_time_ms");
+        double totalTime = sccTime + topoTime + shortestTime + longestTime;
+        int totalRelaxOperations = shortestMetrics.getRelaxOperations() + longestMetrics.getRelaxOperations();
+
+        result.put("total_time_ms", totalTime);
+        result.put("relax_operations", totalRelaxOperations);
+
+        resultExporter.exportGraphResults(result, condensation.getNodeCount());
+
+        return result;
+    }
+
+    private int mapSourceToCondensation(int originalSource, int[] componentIds, List<List<Integer>> components) {
+        if (originalSource < 0 || originalSource >= componentIds.length) {
+            System.out.println("Source node " + originalSource + " is invalid, using component 0");
+            return 0;
+        }
+
+        int sourceComponent = componentIds[originalSource];
+        if (sourceComponent < 0 || sourceComponent >= components.size()) {
+            System.out.println("Source node " + originalSource + " not found in any component, using component 0");
+            return 0;
+        }
+
+        System.out.println("Source node " + originalSource + " mapped to component " + sourceComponent);
+        return sourceComponent;
     }
 
     private GraphData loadGraphData(String filePath) throws Exception {
@@ -102,12 +165,12 @@ public class SmartCityScheduler {
     private void printGraphSummary(GraphData graphData, Graph graph) {
         GraphUtils.GraphStats stats = GraphUtils.getGraphStats(graph);
         System.out.println("Graph Summary:");
-        System.out.println("   • Nodes: " + stats.nodeCount);
-        System.out.println("   • Edges: " + stats.edgeCount);
-        System.out.println("   • Density: " + String.format("%.3f", stats.density));
-        System.out.println("   • Weight Range: [" + stats.minWeight + ", " + stats.maxWeight + "]");
-        System.out.println("   • Directed: " + graphData.directed);
-        System.out.println("   • Source Node: " + graphData.source);
+        System.out.println("   Nodes: " + stats.nodeCount);
+        System.out.println("   Edges: " + stats.edgeCount);
+        System.out.println("   Density: " + String.format("%.3f", stats.density));
+        System.out.println("   Weight Range: [" + stats.minWeight + ", " + stats.maxWeight + "]");
+        System.out.println("   Directed: " + graphData.directed);
+        System.out.println("   Source Node: " + graphData.source);
     }
 
     private void printSCCResults(List<List<Integer>> components) {
@@ -119,76 +182,73 @@ public class SmartCityScheduler {
             System.out.println("   Component " + i + type + ": " + component + " [size: " + component.size() + "]");
         }
 
-        // Analysis
         int cycleComponents = (int) components.stream().filter(c -> c.size() > 1).count();
         int singleNodeComponents = components.size() - cycleComponents;
 
-        System.out.println("\nSCC Analysis:");
-        System.out.println("   • Total Components: " + components.size());
-        System.out.println("   • Cycle Components: " + cycleComponents);
-        System.out.println("   • Single Node Components: " + singleNodeComponents);
+        System.out.println("SCC Analysis:");
+        System.out.println("   Total Components: " + components.size());
+        System.out.println("   Cycle Components: " + cycleComponents);
+        System.out.println("   Single Node Components: " + singleNodeComponents);
     }
 
     private void printTopologicalResults(List<Integer> topoOrder, List<List<Integer>> components) {
         System.out.println("Valid topological order of components:");
         System.out.println("   Component Order: " + topoOrder);
 
-        // Create task execution order
         List<Integer> taskOrder = new ArrayList<>();
         for (int compId : topoOrder) {
             taskOrder.addAll(components.get(compId));
         }
 
         System.out.println("   Task Execution Order: " + taskOrder);
-        System.out.println("\nScheduling Implications:");
-        System.out.println("   • " + topoOrder.size() + " components can be scheduled in order");
-        System.out.println("   • " + taskOrder.size() + " total tasks to execute");
+        System.out.println("Scheduling Implications:");
+        System.out.println("   " + topoOrder.size() + " components can be scheduled in order");
+        System.out.println("   " + taskOrder.size() + " total tasks to execute");
     }
 
     private void printShortestPathResults(int[] shortestDist, int source, List<List<Integer>> components) {
-        System.out.println("Shortest paths from component " + source + " (" + components.get(source) + "):");
+        System.out.println("Shortest paths from component " + source + ":");
 
+        int reachableCount = 0;
         for (int i = 0; i < shortestDist.length; i++) {
             if (shortestDist[i] != Integer.MAX_VALUE) {
-                System.out.println("   → Component " + i + " (" + components.get(i) + "): " +
-                        shortestDist[i] + " units");
+                System.out.println("   -> Component " + i + ": " + shortestDist[i] + " units");
+                reachableCount++;
             } else {
-                System.out.println("   → Component " + i + " (" + components.get(i) + "): unreachable");
+                System.out.println("   -> Component " + i + ": unreachable");
             }
         }
+        System.out.println("   Reachable components: " + reachableCount + "/" + shortestDist.length);
     }
 
     private void printCriticalPathResults(DAGShortestPath.CriticalPath criticalPath, List<List<Integer>> components) {
-        System.out.println("⚡ Critical Path Analysis:");
-        System.out.println("   • Critical Path Length: " + criticalPath.length + " units");
-        System.out.println("   • Critical Path Components: " + criticalPath.path);
+        System.out.println("Critical Path Analysis:");
+        System.out.println("   Critical Path Length: " + criticalPath.length + " units");
+        System.out.println("   Critical Path Components: " + criticalPath.path);
 
-        // Convert component path to task path
         List<Integer> taskPath = new ArrayList<>();
         for (int compId : criticalPath.path) {
             taskPath.addAll(components.get(compId));
         }
 
-        System.out.println("   • Critical Task Sequence: " + taskPath);
-        System.out.println("\nScheduling Insight:");
+        System.out.println("   Critical Task Sequence: " + taskPath);
+        System.out.println("Scheduling Insight:");
         System.out.println("   This path determines the minimum project duration");
-        System.out.println("   Tasks on this path cannot be delayed without affecting overall timeline");
     }
 
-    private void printMetrics(String operation) {
-        System.out.println("\n" + operation + " Metrics:");
-        System.out.println("   • Time: " + String.format("%.3f", metrics.getElapsedTimeMillis()) + " ms");
-        System.out.println("   • DFS Visits: " + metrics.getDfsVisits());
-        System.out.println("   • Edge Traversals: " + metrics.getEdgeTraversals());
-        System.out.println("   • Queue Operations: " +
-                (metrics.getQueuePushes() + metrics.getQueuePops()));
-        System.out.println("   • Relax Operations: " + metrics.getRelaxOperations());
+    private void printMetrics(String operation, Metrics metrics) {
+        System.out.println(operation + " Metrics:");
+        System.out.println("   Time: " + String.format("%.3f", metrics.getElapsedTimeMillis()) + " ms");
+        System.out.println("   DFS Visits: " + metrics.getDfsVisits());
+        System.out.println("   Edge Traversals: " + metrics.getEdgeTraversals());
+        System.out.println("   Queue Pushes: " + metrics.getQueuePushes());
+        System.out.println("   Queue Pops: " + metrics.getQueuePops());
+        System.out.println("   Relax Operations: " + metrics.getRelaxOperations());
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         SmartCityScheduler scheduler = new SmartCityScheduler();
 
-        // Process all datasets
         String[] datasets = {
                 "small_dag.json", "small_cycle.json", "small_mixed.json",
                 "medium_multiple_scc.json", "medium_complex_dag.json", "medium_mixed.json",
@@ -196,30 +256,27 @@ public class SmartCityScheduler {
         };
 
         System.out.println("Smart City Scheduling - Graph Algorithms Pipeline");
-        System.out.println("Repository: https://github.com/Yeras1kAITU/daa_assignment4");
-        System.out.println("Algorithms: SCC (Kosaraju) → Topological Sort (Kahn) → DAG Shortest/Longest Paths");
+        System.out.println("Results will be saved to: results/");
+        System.out.println("Algorithms: SCC -> Topological Sort -> DAG Shortest/Longest Paths");
+
+        long startTime = System.currentTimeMillis();
 
         for (String dataset : datasets) {
             scheduler.processGraph(dataset);
         }
 
-        System.out.println("\n" + "-".repeat(7));
-        System.out.println("All datasets processed successfully!");
-        System.out.println("-".repeat(7));
+        long endTime = System.currentTimeMillis();
 
-        System.out.println("\n" + "*".repeat(30));
-        System.out.println("PERFORMANCE BENCHMARK");
-        System.out.println("*".repeat(30));
+        scheduler.resultExporter.createSummaryReports(scheduler.allResults);
 
-        PerformanceAnalyzer perfAnalyzer = new PerformanceAnalyzer();
-        for (String dataset : datasets) {
-            try {
-                Graph graph = GraphUtils.loadGraphFromFile("data/" + dataset);
-                perfAnalyzer.analyzeGraph(graph, dataset);
-            } catch (Exception e) {
-                System.out.println("Failed to analyze: " + dataset);
-            }
-        }
-        perfAnalyzer.generateReport();
+        System.out.println("\n" + "=".repeat(50));
+        System.out.println("ALL DATASETS PROCESSED SUCCESSFULLY!");
+        System.out.println("=".repeat(50));
+        System.out.println("Performance Summary:");
+        System.out.println("   Total datasets processed: " + datasets.length);
+        System.out.println("   Total processing time: " + (endTime - startTime) + " ms");
+        System.out.println("   Average time per dataset: " + (endTime - startTime) / datasets.length + " ms");
+        System.out.println("Results exported to: " + scheduler.resultExporter.getResultsDirectory());
+        System.out.println("=".repeat(50));
     }
 }

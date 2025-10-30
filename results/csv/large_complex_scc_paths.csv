@@ -1,0 +1,15 @@
+component_id,shortest_distance,longest_distance,reachable,is_source_component
+0,0,0,true,true
+1,2,2,true,false
+2,3,3,true,false
+3,5,5,true,false
+4,6,6,true,false
+5,8,8,true,false
+6,9,9,true,false
+7,11,11,true,false
+8,3,3,true,false
+9,7,7,true,false
+10,10,10,true,false
+11,15,15,true,false
+12,18,18,true,false
+13,22,22,true,false

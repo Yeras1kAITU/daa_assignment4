@@ -7,7 +7,7 @@ import graph.dagsp.DAGShortestPath;
 import java.util.ArrayList;
 import java.util.List;
 
-// Analyzes performance of graph algorithms and provides optimization insights
+// Analyzes performance of graph algorithms
 public class PerformanceAnalyzer {
     private final List<PerformanceResult> results;
 

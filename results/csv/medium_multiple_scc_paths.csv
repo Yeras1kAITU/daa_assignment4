@@ -1,0 +1,7 @@
+component_id,shortest_distance,longest_distance,reachable,is_source_component
+0,UNREACHABLE,UNREACHABLE,false,false
+1,0,0,true,true
+2,6,6,true,false
+3,9,9,true,false
+4,11,11,true,false
+5,12,12,true,false

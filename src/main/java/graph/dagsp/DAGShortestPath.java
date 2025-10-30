@@ -2,9 +2,10 @@ package graph.dagsp;
 
 import graph.Graph;
 import graph.Metrics;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.*;
 
-// Computes shortest and longest paths in Directed Acyclic Graphs (DAGs)
+// Computes shortest and longest paths in DAGs
 public class DAGShortestPath {
     private final Graph graph;
     private final Metrics metrics;
@@ -16,7 +17,7 @@ public class DAGShortestPath {
         this.metrics = metrics;
     }
 
-    // Computes single-source shortest paths in a DAG
+    // Computes single-source the shortest paths in a DAG
     public int[] shortestPaths(int source, List<Integer> topologicalOrder) {
         validateInput(source, topologicalOrder);
         metrics.startTimer();
@@ -72,17 +73,14 @@ public class DAGShortestPath {
     }
 
     private void processTopologicalOrder(int source, List<Integer> topologicalOrder, boolean isLongestPath) {
-        // Find the position of source in topological order
         int sourceIndex = topologicalOrder.indexOf(source);
         if (sourceIndex == -1) {
             throw new IllegalArgumentException("Source node not found in topological order");
         }
 
-        // Process nodes in topological order starting from source
         for (int i = sourceIndex; i < topologicalOrder.size(); i++) {
             int u = topologicalOrder.get(i);
 
-            // Only process nodes reachable from source
             if (dist[u] != (isLongestPath ? Integer.MIN_VALUE : Integer.MAX_VALUE)) {
                 relaxEdges(u, isLongestPath);
             }
@@ -101,7 +99,6 @@ public class DAGShortestPath {
                     prev[edge.target] = u;
                 }
             } else {
-                // Handle potential overflow
                 if (dist[u] == Integer.MAX_VALUE) {
                     continue;
                 }
@@ -122,10 +119,9 @@ public class DAGShortestPath {
 
         List<Integer> path = new ArrayList<>();
         if (dist[target] == Integer.MAX_VALUE || dist[target] == Integer.MIN_VALUE) {
-            return path; // No path exists
+            return path;
         }
 
-        // Backtrack from target to source
         for (int at = target; at != -1; at = prev[at]) {
             path.add(at);
         }
@@ -137,7 +133,6 @@ public class DAGShortestPath {
     public CriticalPath findCriticalPath(int source, List<Integer> topologicalOrder) {
         int[] longestDists = longestPaths(source, topologicalOrder);
 
-        // Find node with maximum distance
         int maxDist = Integer.MIN_VALUE;
         int criticalNode = -1;
         for (int i = 0; i < longestDists.length; i++) {
@@ -165,7 +160,10 @@ public class DAGShortestPath {
 
     // Represents a critical path with its length and node sequence
     public static class CriticalPath {
+        @JsonProperty("length")
         public final int length;
+
+        @JsonProperty("path")
         public final List<Integer> path;
 
         public CriticalPath(int length, List<Integer> path) {

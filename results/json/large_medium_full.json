@@ -1,0 +1,36 @@
+{
+  "scc_dfs_visits" : 36,
+  "components" : [ [ 0 ], [ 2 ], [ 5 ], [ 9 ], [ 1 ], [ 4 ], [ 8 ], [ 12 ], [ 3 ], [ 7 ], [ 11 ], [ 14 ], [ 16 ], [ 6 ], [ 10 ], [ 13 ], [ 15 ], [ 17 ] ],
+  "directed" : true,
+  "source_component" : 0,
+  "longest_distances" : [ 0, 3, 6, 7, 2, 6, 10, 14, 3, 8, 11, 16, 17, 4, 11, 13, 16, 20 ],
+  "longest_paths_time_ms" : 0.017,
+  "relax_operations" : 78,
+  "scc_edge_traversals" : 52,
+  "shortest_paths_time_ms" : 0.0117,
+  "total_time_ms" : 0.1135,
+  "topo_time_ms" : 0.027,
+  "topo_queue_pushes" : 18,
+  "edge_count" : 26,
+  "topo_queue_pops" : 18,
+  "original_source" : 0,
+  "filename" : "large_medium.json",
+  "scc_time_ms" : 0.0578,
+  "shortest_distances" : [ 0, 3, 6, 7, 2, 5, 8, 10, 3, 7, 9, 12, 13, 4, 6, 8, 11, 15 ],
+  "topological_order" : [ 0, 4, 1, 8, 5, 2, 13, 9, 6, 3, 14, 10, 7, 15, 11, 16, 12, 17 ],
+  "node_count" : 18,
+  "is_dag" : true,
+  "metrics" : {
+    "edge_traversals" : 52,
+    "dfs_visits" : 36,
+    "relax_operations" : 78,
+    "queue_pushes" : 18,
+    "queue_pops" : 18,
+    "scc_count" : 18
+  },
+  "scc_count" : 18,
+  "critical_path" : {
+    "length" : 20,
+    "path" : [ 0, 4, 8, 9, 14, 15, 16, 17 ]
+  }
+}
